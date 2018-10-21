@@ -6,6 +6,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 public class Runner implements CommandLineRunner {
 
@@ -19,9 +21,17 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Sending message...");
-        rabbitTemplate.convertAndSend(Application.topicExchangeName, "foo.bar.baz", "Hello from RabbitMQ!");
-        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+        for (int i=1; i <= 100; i++){
+            Date now = new Date();
+            int millis = 1000;
+            System.out.println("Sending message...");
+            rabbitTemplate.convertAndSend(
+                //Application.topicExchangeName, "foo.bar.baz", "Hello from RabbitMQ!"
+                Application.topicExchangeName, "foo.bar.baz", i+": "+now.toString()+" Hello from RabbitMQ!"
+                );
+            receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+            Thread.sleep(millis);
+        }
     }
 
 }
